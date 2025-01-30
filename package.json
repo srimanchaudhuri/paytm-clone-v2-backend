@@ -2,10 +2,12 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "vercel-build": "vercel build"
   },
+  "main": "src/serverless.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
