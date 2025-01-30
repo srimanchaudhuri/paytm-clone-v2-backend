@@ -1,7 +1,8 @@
+require('dotenv').config()
 const mongoose = require("mongoose")
 
 mongoose.connect(
-    "mongodb+srv://srimanchaudhuri:simonsurfer123@cluster0.7gr0ss0.mongodb.net/"
+    process.env.DB_URL
   )
   .then(() => {
     console.log("Connection with db established");

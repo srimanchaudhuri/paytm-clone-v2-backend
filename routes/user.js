@@ -1,9 +1,9 @@
 const express = require("express");
+require('dotenv').config()
 const zod = require("zod");
 const { User, Account } = require("../db.js");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { JWT_SECRET } = require("../config");
 const { authMiddleware } = require("../middleware.js");
 
 const userRouter = express.Router();
@@ -63,7 +63,7 @@ userRouter.post("/signup", async (req, res, next) => {
         }
     )
 
-    const jwtToken = jwt.sign({ userId }, JWT_SECRET);
+    const jwtToken = jwt.sign({ userId }, process.env.JWT_SECRET);
 
     res.status(201).json({
       message: "User created successfully",
@@ -100,7 +100,7 @@ userRouter.post("/signin", async (req, res) => {
   }
 
   const userId = user._id;
-  const jwtToken = jwt.sign({ userId }, JWT_SECRET);
+  const jwtToken = jwt.sign({ userId }, process.env.JWT_SECRET);
 
   res.status(200).json({
     message: "User signed in successfully",
@@ -139,13 +139,30 @@ userRouter.put("/", authMiddleware, async (req, res) => {
   });
 });
 
+userRouter.get("/current-user", authMiddleware, async (req, res) => {
+  const userId = req.userId
+  
+  const user = await User.findById(userId)
+
+  res.json({
+    user
+  })
+})
+
 userRouter.get("/bulk", authMiddleware, async (req, res) => {
-    const filter = req.params.filter || ""
+  const filter = req.query.filter || "";
 
     const users = await User.find({
-        firstName: {$regex: filter},
-        lastName: {$regex: filter}
-    })
+      $or: [{
+          firstName: {
+              "$regex": filter
+          }
+      }, {
+          lastName: {
+              "$regex": filter
+          }
+      }]
+  })
 
     res.status(200).json({
         user: users.map(user => (
